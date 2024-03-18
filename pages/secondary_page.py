@@ -11,11 +11,6 @@ class Secondary(BasePage):
     filter_but = (By.CSS_SELECTOR, '.filter-text')
     want_to_buy = (By.XPATH,"//div[@class = 'tag-text-filters' and text()='Want to buy']")
     apply_filter = (By.XPATH, "//a[text()='Apply filter']")
-    all_cards = (By.XPATH, "//div[@wized='saleTagMLS']")
-    want_to_buy_tag = (By.XPATH, "//div[text()='Want to buy']")
-    next_page = (By.XPATH, "//a[@wized='nextPageMLS']")
-    last_page = (By.XPATH, "//div[@wized='totalPageProperties' and @class='page-count']/text()")
-    first_page = (By.XPATH, "//div[@wized='currentPageProperties' and @class='page-count']/text()" )
 
     def secondary_page_open(self,secondary):
         secondary = self.find_element(*self.secondary).text
@@ -35,44 +30,23 @@ class Secondary(BasePage):
         self.click_button(*self.apply_filter)
         sleep(3)
 
-    # def all_cards_have_want_to_buy_tag(self):
-    #     want_to_buy = []
-    #     while True:
-    #
-    #         if self.first_page <= self.last_page:
-    #             print(self.first_page)
-    #             print(self.last_page)
-    #             self.driver.execute_script("window.scrollBy(0,2000)", "")
-    #             sleep(2)
-    #             want_to_buy_all_pages = self.driver.find_elements(*self.want_to_buy_tag)
-    #             want_to_buy.extend(want_to_buy_all_pages)
-    #             self.click_button(*self.next_page)
-    #             sleep(5)
-    #         else:
-    #             break
-    #     print(want_to_buy)
-    #     for element in want_to_buy:
-    #         tag_text = element.text
-    #         print(tag_text)
-    #         assert tag_text, f"want to buy is not in {tag_text}"
+    def verify_want_to_buy_tag(self):
+        tags = self.find_elements( By.XPATH, '//div[@wized="saleTagMLS" and text()="Want to buy"]' )
+        cards = self.find_elements( By.CLASS_NAME, 'for-sale-block' )
+        assert len( tags ) == len( cards ), "Number of tags does not match number of cards"
+        return True
+
+    def navigate_to_next_page(self):
+        next_button = WebDriverWait( self.driver, 10 ).until(
+            EC.element_to_be_clickable( (By.CSS_SELECTOR, 'a.pagination__button') ) )
+        next_button.click()
 
     def all_cards_have_want_to_buy_tag(self):
+        total_pages_element = self.find_element( By.XPATH, '//div[@wized="totalPageProperties"]' )
+        total_pages = int( total_pages_element.text )
+        print( 'Total pages:', total_pages )
 
-        for card in self.all_cards:
-            tags = self.find_elements(*self.want_to_buy_tag)
-            print(tags.text)
-            want_to_buy_tag_present = False
-            for tag in tags:
-                if tag.text == "want to buy":
-                    want_to_buy_tag_present = True
-                    break
-            if not want_to_buy_tag_present:
-                print("Not all cards have 'want to buy' tag.")
-                break
-        else:
-            print("All cards have 'want to buy' tag.")
-
-
-
-
+        for page_number in range( 1, total_pages + 1 ):
+            assert self.verify_want_to_buy_tag(), f"Not all cards have the 'Want to buy' tag on page {page_number}."
+            self.navigate_to_next_page()
 
