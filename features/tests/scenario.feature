@@ -1,6 +1,6 @@
 Feature: Testing Reelly.io
 
-  Scenario: The first task internship
+  Scenario: User can filter the Secondary deals by “want to buy” option
     Given Open the main page
     And Log in to the page
     When Click on Secondary option at the left side menu
