@@ -8,8 +8,8 @@ from time import sleep
 class Secondary(BasePage):
     secondary = (By.XPATH, '//div[text()="Listings"]')
     filter_but = (By.CSS_SELECTOR, '.filter-text')
-    want_to_buy = (By.XPATH,"//div[@class = 'tag-text-filters' and text()='Want to buy']")
     apply_filter = (By.XPATH, "//a[text()='Apply filter']")
+    want_to_buy = (By.XPATH, '//div[@class = "tag-text-filters" and text() = "Want to buy"]')
 
     def secondary_page_open(self,secondary):
         secondary = self.find_element(*self.secondary).text
